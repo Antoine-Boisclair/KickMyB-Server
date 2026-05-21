@@ -99,13 +99,19 @@ public class ServiceTache  {
         repoUser.save(utilisateur);
     }
 
-    public void miseAJourProgres(long taskID, int value) {
-        MTache element = repo.findById(taskID).get();
+    public void miseAJourProgres(long taskID, int value, long idUtilisateur) {
+        MUtilisateur utilisateur = repoUser.findById(idUtilisateur).get();
+
+        MTache element = utilisateur.taches.stream()
+                .filter(t -> t.id == taskID)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Accès refusé ou tâche inexistante"));
+        
         if (value < 0 || value > 100) {
-            // TODO pourquoi être cohérent sur les exceptions quand on peut ne pas l'être
             throw new IllegalArgumentException("Valeur entre 0 et 100");
         }
-        MAvancement pe= new MAvancement();
+
+        MAvancement pe = new MAvancement();
         pe.nouveauPourcentage = value;
         pe.date = DateTime.now().toDate();
         repoProgressEvent.save(pe);

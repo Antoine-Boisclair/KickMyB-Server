@@ -152,7 +152,7 @@ class TestsServiceTache {
         assertEquals(1, serviceTache.accueil(alice.id).size());
     }
     
-    @Test
+        @Test
         void testSupprimerTacheOk() throws Exception {
             RequeteInscription req = new RequeteInscription();
             req.nom = "alice";
@@ -172,7 +172,7 @@ class TestsServiceTache {
     
             assertEquals(0, serviceTache.accueil(alice.id).size());
         }
-    
+
         @Test
         void testSupprimerTacheAccesRefuseKo() throws Exception {
             RequeteInscription reqAlice = new RequeteInscription();
@@ -197,5 +197,31 @@ class TestsServiceTache {
             }
     
             assertEquals(1, serviceTache.accueil(alice.id).size());
+        }
+
+        @Test
+        void testMiseAJourProgresAccesRefuseKo() throws Exception {
+            RequeteInscription reqAlice = new RequeteInscription();
+            reqAlice.nom = "alice"; reqAlice.motDePasse = "Passw0rd!"; reqAlice.confirmationMotDePasse = "Passw0rd!";
+            serviceAccount.inscrire(reqAlice);
+            MUtilisateur alice = serviceTache.utilisateurParSonNom("alice");
+
+            RequeteInscription reqBob = new RequeteInscription();
+            reqBob.nom = "bob"; reqBob.motDePasse = "Passw0rd!"; reqBob.confirmationMotDePasse = "Passw0rd!";
+            serviceAccount.inscrire(reqBob);
+            MUtilisateur bob = serviceTache.utilisateurParSonNom("bob");
+
+            RequeteAjoutTache taskReq = new RequeteAjoutTache();
+            taskReq.nom = "Tâche d'Alice";
+            serviceTache.ajouteUneTache(taskReq, alice.id);
+            long idTacheAlice = serviceTache.accueil(alice.id).get(0).id;
+
+            try {
+                serviceTache.miseAJourProgres(idTacheAlice, 100, bob.id);
+            } catch (RuntimeException e) {
+                return;
+            }
+
+            throw new Exception("Test échoué : Bob a réussi à modifier la tâche d'Alice !");
         }
 }

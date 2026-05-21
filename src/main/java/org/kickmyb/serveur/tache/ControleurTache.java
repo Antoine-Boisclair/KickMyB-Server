@@ -46,8 +46,8 @@ public class ControleurTache {
 
     @GetMapping(value = "/tache/progres/{idTache}/{valeur}", produces = "text/plain")
     public @ResponseBody String updateProgress(@PathVariable long idTache, @PathVariable int valeur) {
-        System.out.println("KICKB SERVEUR : Mise à jour : " + idTache + " @" + valeur);
-        serviceTache.miseAJourProgres(idTache, valeur);
+        MUtilisateur utilisateur = utilisateurDepuisCookie();
+        serviceTache.miseAJourProgres(idTache, valeur, utilisateur.id);
         return "";
     }
 

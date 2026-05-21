@@ -22,6 +22,19 @@ public class ControleurTache {
     // @Component qui implémente l'interface
     @Autowired
     private ServiceTache serviceTache;
+    
+    @DeleteMapping(value = "/tache/supprimer/{id}")
+    public @ResponseBody String supprimer(@PathVariable long id) {
+        System.out.println("KICKB SERVEUR : Suppression de la tâche " + id);
+        MUtilisateur utilisateur = utilisateurDepuisCookie();
+        
+        try {
+            serviceTache.supprimerUneTache(id, utilisateur.id);
+            return "Succès";
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la suppression");
+        }
+    }
 
     @PostMapping(value = "/tache/ajout", produces = "text/plain")
     public @ResponseBody String ajout(@RequestBody RequeteAjoutTache requete) throws ServiceTache.Vide, ServiceTache.Existant, ServiceTache.TropCourt {

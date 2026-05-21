@@ -151,4 +151,51 @@ class TestsServiceTache {
         // on vérifie que la tâche 2 n'a pas été ajoutée
         assertEquals(1, serviceTache.accueil(alice.id).size());
     }
+    
+    @Test
+        void testSupprimerTacheOk() throws Exception {
+            RequeteInscription req = new RequeteInscription();
+            req.nom = "alice";
+            req.motDePasse = "Passw0rd!";
+            req.confirmationMotDePasse = "Passw0rd!";
+            serviceAccount.inscrire(req);
+            MUtilisateur alice = serviceTache.utilisateurParSonNom("alice");
+    
+            RequeteAjoutTache addTaskRequest = new RequeteAjoutTache();
+            addTaskRequest.nom = "Tâche à supprimer";
+            addTaskRequest.dateLimite = new Date();
+            serviceTache.ajouteUneTache(addTaskRequest, alice.id);
+            
+            long idTache = serviceTache.accueil(alice.id).get(0).id;
+    
+            serviceTache.supprimerUneTache(idTache, alice.id);
+    
+            assertEquals(0, serviceTache.accueil(alice.id).size());
+        }
+    
+        @Test
+        void testSupprimerTacheAccesRefuseKo() throws Exception {
+            RequeteInscription reqAlice = new RequeteInscription();
+            reqAlice.nom = "alice"; reqAlice.motDePasse = "Passw0rd!"; reqAlice.confirmationMotDePasse = "Passw0rd!";
+            serviceAccount.inscrire(reqAlice);
+            MUtilisateur alice = serviceTache.utilisateurParSonNom("alice");
+    
+            RequeteInscription reqBob = new RequeteInscription();
+            reqBob.nom = "bob"; reqBob.motDePasse = "Passw0rd!"; reqBob.confirmationMotDePasse = "Passw0rd!";
+            serviceAccount.inscrire(reqBob);
+            MUtilisateur bob = serviceTache.utilisateurParSonNom("bob");
+    
+            RequeteAjoutTache addTaskRequest = new RequeteAjoutTache();
+            addTaskRequest.nom = "Tâche d'Alice";
+            addTaskRequest.dateLimite = new Date();
+            serviceTache.ajouteUneTache(addTaskRequest, alice.id);
+            long idTacheAlice = serviceTache.accueil(alice.id).get(0).id;
+    
+            try {
+                serviceTache.supprimerUneTache(idTacheAlice, bob.id);
+            } catch (Exception e) {
+            }
+    
+            assertEquals(1, serviceTache.accueil(alice.id).size());
+        }
 }

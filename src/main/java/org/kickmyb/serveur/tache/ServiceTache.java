@@ -27,6 +27,19 @@ public class ServiceTache  {
     DepotTache repo;
     @Autowired
     MAvancementRepository repoProgressEvent;
+    
+    public void supprimerUneTache(long idTache, long idUtilisateur) {
+        MUtilisateur utilisateur = repoUser.findById(idUtilisateur).orElseThrow();
+        
+        MTache tache = utilisateur.taches.stream()
+                .filter(t -> t.id == idTache)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Tâche introuvable ou accès refusé"));
+                
+        utilisateur.taches.remove(tache);
+        repoUser.save(utilisateur);
+        repo.delete(tache);
+    }
 
     private int calculPourcentageTemps(Date start, Date current, Date end){
         if (current.after(end)) return 100;
